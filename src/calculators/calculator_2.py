@@ -3,6 +3,7 @@ from flask import request as FlaskRequest
 from src.drivers.interfaces.driver_handler_interface import (
     DriverHandlerInterface
 )
+from src.errors.invalid_request_body import InvalidRequestBodyError
 
 
 class Calculator2:
@@ -20,7 +21,7 @@ class Calculator2:
 
     def __validate_body(self, body: Dict) -> List[float]:
         if "numbers" not in body:
-            raise Exception("body mal formatado!")
+            raise InvalidRequestBodyError("O corpo da requisição deve conter a chave 'numbers'.")
 
         input_data = body["numbers"]
         return input_data

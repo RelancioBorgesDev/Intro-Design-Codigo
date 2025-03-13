@@ -3,6 +3,8 @@ from typing import Dict, List
 from src.drivers.interfaces.driver_handler_interface import (
     DriverHandlerInterface
 )
+from src.errors.calculation_error import CalculationError
+from src.errors.invalid_request_body import InvalidRequestBodyError
 
 
 class Calculator4:
@@ -15,7 +17,6 @@ class Calculator4:
 
         median = self.__calculate_median(input_data)
         formated_response = self.__format_response(median)
-
         return formated_response
 
     def calculate_mean(self, request: FlaskRequest) -> Dict:  # Nova função para calcular a média
@@ -24,29 +25,18 @@ class Calculator4:
 
         mean = self.__calculate_mean(input_data)
         formated_response = self.__format_response(mean, operation="Mean")
-
         return formated_response
 
     def __validate_body(self, body: Dict) -> List[float]:
         if "numbers" not in body:
-            raise Exception("body mal formatado!")
+            raise InvalidRequestBodyError("O corpo da requisição deve conter a chave 'numbers'.")
 
         input_data = body["numbers"]
+        if not isinstance(input_data, list) or not all(isinstance(n, (int, float)) for n in input_data):
+            raise InvalidRequestBodyError("A chave 'numbers' deve ser uma lista de números.")
+
+        if not input_data:
+            raise CalculationError("A lista de números não pode estar vazia.")
+
         return input_data
 
-    def __calculate_median(self, numbers: List[float]) -> float:
-        median = self.__driver_handler.median_of_a_list(numbers)
-        return median
-
-    def __calculate_mean(self, numbers: List[float]) -> float:  # Novo cálculo de média
-        return sum(numbers) / len(numbers) if numbers else 0
-
-    def __format_response(self, value: float, operation="Median") -> Dict:
-        return {
-            "data": {
-                "Calculator": 4,
-                "Operation": operation,
-                "value": value,
-                "Success": True,
-            }
-        }

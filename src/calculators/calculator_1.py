@@ -1,6 +1,6 @@
 from typing import Dict
 from flask import request as FlaskRequest
-
+from src.errors.invalid_request_body import InvalidRequestBodyError
 
 class Calculator1:
 
@@ -20,8 +20,7 @@ class Calculator1:
 
     def __validate_body(self, body: Dict) -> float:
         if "number" not in body:
-            raise Exception("body mal formatado!")
-
+            raise InvalidRequestBodyError("O corpo da requisição deve conter a chave 'number'.")
         input_data = body["number"]
         return input_data
 
